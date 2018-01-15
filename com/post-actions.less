@@ -1,0 +1,62 @@
+.post-actions {
+  margin-left: 55px;
+  height: 13px;
+
+  .action {
+    display: inline-block;
+    width: 55px;
+
+    .count {
+      color: @muted-text;
+      font-size: 11.5px;
+      font-weight: 700;
+      vertical-align: top;
+      margin-left: 5px;
+    }
+
+    &.reply:hover {
+
+      .count {
+        color: var(--theme-color);
+      }
+
+      * {
+        stroke: var(--theme-color);
+      }
+    }
+
+    &.vote.voted,
+    &.vote:hover {
+
+      .count {
+        color: crimson;
+      }
+
+      * {
+        stroke: crimson;
+      }
+    }
+  }
+
+  .icon * {
+    stroke: #999;
+    stroke-width: 8px;
+  }
+
+  .vote-icon {
+
+    &.voted {
+
+      .heart * {
+        fill: crimson;
+        stroke: crimson;
+      }
+    }
+  }
+
+  .icon {
+    cursor: pointer;
+    width: 14.5px;
+    height: 14.5px;
+  }
+}

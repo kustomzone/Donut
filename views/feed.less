@@ -1,0 +1,39 @@
+.view.feed {
+
+  .reply-form,
+  .new-post-form {
+    background: var(--theme-color-faded);
+    padding: 15px;
+  }
+
+  .new-post-form {
+
+    .inputs {
+      display: flex;
+      flex-wrap: nowrap;
+    }
+
+    .actions {
+      text-align: right;
+      margin-top: 10px;
+      display: none;
+
+      &.editing {
+        display: block;
+      }
+    }
+
+    textarea {
+      display: inline-block;
+    }
+
+    .avatar-container {
+      vertical-align: top;
+      margin-right: 10px;
+    }
+
+    .avatar {
+      margin-top: 3px;
+    }
+  }
+}

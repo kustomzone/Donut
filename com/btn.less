@@ -1,0 +1,65 @@
+button {
+  outline: 0;
+  background: none;
+  font-size: inherit;
+  border: 0;
+}
+
+.btn {
+  display: inline-block;
+  height: 26px;
+  padding: 0 13px;
+  background: none;
+  border: 1px solid var(--theme-color);
+  border-radius: 40px;
+  color: var(--theme-color);
+  cursor: pointer;
+  font-size: .85rem;
+  text-align: center;
+  line-height: 25px;
+  vertical-align: middle;
+
+  &:hover {
+    background: var(--theme-color-faded);
+    text-decoration: none;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 2.25px var(--theme-color-box-shadow);
+    outline: 0;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+
+  &.primary,
+  &.follow-btn.following,
+  &.new-reply,
+  &.unfollow,
+  &.new-post {
+    background: var(--theme-color);
+    color: #fff;
+    -webkit-font-smoothing: antialiased;
+    font-weight: 700;
+
+    &:hover {
+      background: var(--primary-btn-hover);
+    }
+
+    &:disabled {
+      background: var(--theme-color-box-shadow) !important;
+      color: fadeout(#fff, 10%) !important;
+      border: none !important;
+    }
+  }
+
+  &.follow-btn {
+    width: 95px; // fix the width so on hover the text change doesn't change the width
+
+    &.unfollow {
+      background: #c40e0e;
+      border-color: #c40e0e;
+    }
+  }
+}
