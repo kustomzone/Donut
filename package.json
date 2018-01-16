@@ -4,9 +4,9 @@
   "description": "A P2P demo app for Beaker using Dat (fritter clone)",
   "main": "index.js",
   "scripts": {
-    "build:css": "lessc index.less assets/index.css",
-    "build:js": "browserify index.js > assets/index.js",
-    "build:js-prod": "browserify index.js | uglifyjs -c > assets/index.js",
+    "build:css": "lessc index.less css/index.css",
+    "build:js": "browserify index.js > js/index.js",
+    "build:js-prod": "browserify index.js | uglifyjs -c > js/index.js",
     "build": "npm run build:js && npm run build:css",
     "build-prod": "npm run build:js-prod && npm run build:css",
     "test": "echo \"Error: no test specified\" && exit 1"
