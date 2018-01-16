@@ -19,6 +19,8 @@ A P2P demo social app for [Beaker Browser](https://github.com/beakerbrowser/beak
 
 ## URL
 
-Demo: dat://kustomzone.github.io/
+(requires 'dat://' compatible browser)
 
-Demo: dat://3232bbadb94435542ed0c8370797ca130cf52e4c48c014ac42f484b91331d68d
+Demo: [dat://kustomzone.github.io/](dat://kustomzone.github.io/)
+
+Demo: [dat://3232bbadb94435542ed0c8370797ca130cf52e4c48c014ac42f484b91331d68d](dat://3232bbadb94435542ed0c8370797ca130cf52e4c48c014ac42f484b91331d68d)
