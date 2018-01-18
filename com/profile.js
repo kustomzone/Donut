@@ -1,8 +1,8 @@
 /* globals app */
 
-const yo = require('yo-yo')
+const yo                 = require('yo-yo')
 const renderFollowButton = require('./follow-btn')
-const {linkifyText} = require('../lib/util')
+const {linkifyText}      = require('../lib/util')
 
 // exported api
 // =

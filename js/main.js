@@ -4,7 +4,7 @@ setTimeout(function(){
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /* globals app */
 
-const yo               = require('yo-yo')
+const yo = require('yo-yo')
 const imgWithFallbacks = require('./img-with-fallbacks')
 
 module.exports = function renderAvatar (profile, cls = '') {
@@ -25066,6 +25066,7 @@ const renderFooter           = require('../com/footer')
 const renderProfileEditor    = require('../com/profile-editor')
 const renderProfilePicker    = require('../com/profile-picker')
 const renderThemeColorPicker = require('../com/theme-color-picker')
+const renderImageSettings    = require('../com/image-settings')
 
 // exported api
 // =
@@ -25077,25 +25078,30 @@ module.exports = function () {
         ${renderProfileCard(app.currentUserProfile)}
         ${renderFooter()}
       </div>
-
+	
       <div class="main-col">
         <div class="settings-view">
           ${renderProfileEditor()}
         </div>
-
+	
         <div class="settings-view">
           ${renderProfilePicker()}
         </div>
-
+	
         <div class="settings-view">
           ${renderThemeColorPicker()}
         </div>
+		
+        <div class="settings-view">
+          ${renderImageSettings()}
+        </div>
+	
       </div>
     </div>
   `
 }
 
-},{"../com/footer":5,"../com/profile-card":20,"../com/profile-editor":21,"../com/profile-picker":24,"../com/theme-color-picker":25,"yo-yo":222}],233:[function(require,module,exports){
+},{"../com/footer":5,"../com/profile-card":20,"../com/profile-editor":21,"../com/profile-picker":24,"../com/theme-color-picker":25,"../com/image-settings":235,"yo-yo":222}],233:[function(require,module,exports){
 /* globals app */
 
 const yo                = require('yo-yo')
@@ -25402,7 +25408,85 @@ function renderAlbum () {
   `
 }
 
-},{"yo-yo":222,"../com/albums":234}]},{},[28]);
+},{"yo-yo":222,"../com/albums":234}],235:[function(require,module,exports){
+/* globals app */
+
+const yo                  = require('yo-yo')
+const renderImageSettings = require('../com/image-settings')
+
+// exported api
+// =
+
+module.exports = function () {
+  return yo`
+      <div class="sidebar-col">
+		${renderImageSettingz()}
+      </div>
+
+  `
+}
+
+// internal methods
+// =
+
+function renderImageSettingz () {
+  // Don't show on new user creation
+  const isNew = !app.currentUserProfile
+  if ( isNew ) return yo``
+
+  return yo`
+    <div id="image-settings" class="settings-view image-settings-wrap">
+      <h2>Image Settings</h2>
+
+      <form class="image-settings" onsubmit=${onUpdateImageSettings}>
+       <p class="settings-view">
+        <input ${isCurrentSetting('all') ? 'checked' : ''} type="radio" id="choice-all" name="embedImages" value="all">
+        <label for="choice-all">Embed all images</label>
+       </p>
+       <p class="settings-view">
+        <input ${isCurrentSetting('dat') ? 'checked' : ''} type="radio" id="choice-dat" name="embedImages" value="dat">
+        <label for="choice-dat">Embed only images from dat:// sources</label>
+       </p>
+       <p class="settings-view">
+        <input ${isCurrentSetting('dat-followed') ? 'checked' : ''} type="radio" id="choice-dat-followed" name="embedImages" value="dat-followed">
+        <label for="choice-dat-followed">Embed only images from dat:// sources I follow</label>
+       </p>
+       <p class="settings-view">
+        <input ${isCurrentSetting('none') ? 'checked' : ''} type="radio" id="choice-none" name="embedImages" value="none">
+        <label for="choice-none">Don't embed images</label>
+       </p>
+       <p class="settings-view">
+        <div class="actions">
+          <button type="button" class="btn" onclick=${app.gotoFeed}>Cancel</button>
+          <button type="submit" class="btn primary">Save</button>
+        </div>
+       </p>
+      </form>
+    </div>
+  `
+
+  async function onUpdateImageSettings(e){
+    e.preventDefault()
+
+    // Load existing settings
+    const settings = JSON.parse(window.localStorage.settings || '{}')
+
+    // Save new value of settings
+    const imageSetting = document.querySelector('input[name=embedImages]:checked').value
+    settings.imageEmbed = imageSetting
+    await app.updateSettings(settings)
+    app.gotoFeed()
+  }
+
+  function isCurrentSetting(val){
+    const settings = JSON.parse(window.localStorage.settings || '{}')
+    return val === settings.imageEmbed || (!settings.imageEmbed && val === 'none')
+  }
+  
+}
+
+
+},{"yo-yo":222,"../com/image-settings":235}]},{},[28]);
 
 }, 5000)
 

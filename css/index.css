@@ -1,3 +1,4 @@
+
 header {
   position: fixed;
   z-index: 3;
@@ -8,7 +9,7 @@ header {
 header nav {
   display: flex;
   margin: auto;
-  max-width: 1000px;
+  max-width: 900px;
   height: 100%;
 }
 header .nav-item {
@@ -112,12 +113,12 @@ textarea {
   border: 1px solid #D0D0B0;
   font-size: .825rem;
 }
-input[type="checkbox"]:focus,
-textarea[type="checkbox"]:focus,
-input[type="radio"]:focus,
-textarea[type="radio"]:focus,
-input[type="range"]:focus,
-textarea[type="range"]:focus {
+input[    type="checkbox"]:focus,
+textarea[ type="checkbox"]:focus,
+input[    type="radio"]:focus,
+textarea[ type="radio"]:focus,
+input[    type="range"]:focus,
+textarea[ type="range"]:focus {
   box-shadow: none;
 }
 input[type="file"],
@@ -920,18 +921,22 @@ form#pick-theme-color .theme-color-label {
 .view.feed .new-post-form .avatar {
   margin-top: 3px;
 }
+
 .settings-view {
   margin-bottom: 15px;
 }
 .settings-view form,
-.settings-view h2 {
+.settings-view h2,
+.settings-view p {
   width: 100%;
   padding: 15px;
   background: #F0F0D6;
+  flex-wrap: nowrap;
 }
 .settings-view h2 {
   margin-bottom: 1px;
 }
+
 .view.new-user {
   display: block;
   max-width: 550px;
