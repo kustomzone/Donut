@@ -1,10 +1,10 @@
 /* globals app */
 
 const yo = require('yo-yo')
-const renderHomeIcon = require('../com/icons/home')
-const renderErrorIcon = require('../com/icons/error')
+const renderHomeIcon     = require('../com/icons/home')
+const renderErrorIcon    = require('../com/icons/error')
 const renderSettingsIcon = require('../com/icons/settings')
-const renderAvatar = require('../com/avatar')
+const renderAvatar       = require('../com/avatar')
 
 // exported api
 
@@ -21,7 +21,7 @@ module.exports = function renderHeader () {
 
         <a class="nav-item ${app.currentView === 'notifications' ? 'active' : ''}" href="/notifications" onclick=${app.gotoNotifications}>
           <span class="icon settings">${renderErrorIcon()}</span>
-          <span class="label">Notifications</span>
+          <span class="label">Info</span>
           ${app.unreadNotifications ? yo`<span class="count">${app.unreadNotifications}</span>` : ''}
         </a>
 

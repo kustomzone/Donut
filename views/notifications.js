@@ -1,9 +1,9 @@
 /* globals app */
 
 const yo = require('yo-yo')
-const renderProfileCard = require('../com/profile-card')
-const renderFooter = require('../com/footer')
-const renderWhoToFollow = require('../com/who-to-follow')
+const renderProfileCard   = require('../com/profile-card')
+const renderFooter        = require('../com/footer')
+const renderWhoToFollow   = require('../com/who-to-follow')
 const renderNotifications = require('../com/notifications')
 
 // exported api

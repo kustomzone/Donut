@@ -16,7 +16,7 @@
   let archive, archiveInfo
   let selectedImages = []
 
-  const urlEl = document.getElementById('url')
+  const urlEl    = document.getElementById('url')
   const shareBtn = document.getElementById('share-btn')
   shareBtn.addEventListener('click', onShare)
 
@@ -245,4 +245,5 @@
     }
     return value
   }
+  
 })()

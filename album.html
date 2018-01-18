@@ -1,10 +1,22 @@
-const yo = require('yo-yo')
+<!doctype html>
+<html>
+  <head>
+    <title></title>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="{{DAT_ARCHIVE_URL}}/css/base.css"/>
+    <link rel="stylesheet" href="{{DAT_ARCHIVE_URL}}/css/header.css"/>
+    <link rel="stylesheet" href="{{DAT_ARCHIVE_URL}}/css/album.css"/>
+    <link rel="stylesheet" href="{{DAT_ARCHIVE_URL}}/css/prompt.css"/>
+    <link rel="stylesheet" href="{{DAT_ARCHIVE_URL}}/css/index.css"/>
+    <link rel="stylesheet" href="{{DAT_ARCHIVE_URL}}/css/buttons.css"/>
+  </head>
 
-// exported api
+  <body>
+    <div id="prompt">
+      <div class="content">Loading...</div>
+    </div>
 
-module.exports = function renderAlbums () {
-  return yo`
-    <div>
+    <header>
       <a href="{{DAT_ARCHIVE_URL}}/">All albums</a>
 
       <div>
@@ -22,7 +34,7 @@ module.exports = function renderAlbums () {
           </div>
         </button>
       </div>
-    </div>
+    </header>
 
     <div class="container">
       <div class="info">
@@ -33,7 +45,6 @@ module.exports = function renderAlbums () {
       <div class="album-images"></div>
     </div>
     <textarea id="url"></textarea>
-	
     <script src="{{DAT_ARCHIVE_URL}}/js/album.js"></script>
-  `
-}
+  </body>
+</html>

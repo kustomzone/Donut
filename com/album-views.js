@@ -2,18 +2,16 @@ const yo = require('yo-yo')
 
 // exported api
 
-module.exports = function renderAlbumView () {
+module.exports = function renderAlbumViews () {
   return yo`
     <div>
-      <a href="{{DAT_ARCHIVE_URL}}/">
-        &laquo All albums
-      </a>
+      <a href="{{DAT_ARCHIVE_URL}}/">All albums</a>
 
       <div>
         <button id="share-btn" class="btn">Share</button>
         <label class="btn primary" for="files">
           Add photos +
-          <input type="file" name="files" accept="image/*" multiple/>
+          <input type="file" name="files" accept="image/*" multiple>
         </label>
         <button id="more-btn" class="btn more">
           <span>▾</span>
