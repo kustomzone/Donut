@@ -6,19 +6,21 @@ A P2P demo social app for [Beaker Browser](https://github.com/beakerbrowser/beak
 
 ## Features
 
-- Writing posts
-- Replying to posts
-- Favoriting posts and replies
-- Following users
-- Editing your profile
+- [x] Writing posts
+- [x] Replying to posts
+- [x] Favoriting posts and replies
+- [x] Following users
+- [x] Editing your profile
+- [x] New Theme
 
 ## Pending
 
-- Follow Users (bug)
-- New Theme (wip)
-- Image Uploading (todo)
+- [ ] Image Uploading & Albums
 
 ## URL
 
-- dat://3232bbadb94435542ed0c8370797ca130cf52e4c48c014ac42f484b91331d68d
+(requires 'dat://' compatible browser)
 
+Demo: [dat://kustomzone.github.io/](dat://kustomzone.github.io/)
+
+Demo: [dat://3232bbadb94435542ed0c8370797ca130cf52e4c48c014ac42f484b91331d68d](dat://3232bbadb94435542ed0c8370797ca130cf52e4c48c014ac42f484b91331d68d)
