@@ -11,13 +11,14 @@ A P2P demo social app for [Beaker Browser](https://github.com/beakerbrowser/beak
 - [x] Favoriting posts and replies
 - [x] Following users
 - [x] Editing your profile
-- [x] New Theme
+- [x] Photo Albums
 
 ## Pending
 
-- [ ] Image Uploading & Albums
+- [ ] Album options from menu
+- [ ] Image selection from new post
 
-## URL
+## Demos
 
 (requires 'dat://' compatible browser)
 
