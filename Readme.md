@@ -15,8 +15,9 @@ A P2P demo social app for [Beaker Browser](https://github.com/beakerbrowser/beak
 
 ## Pending
 
+- [ ] Private messaging
 - [ ] Album options from menu
-- [ ] Image selection from new post
+- [ ] Image selection for new posts
 
 ## Demos
 
