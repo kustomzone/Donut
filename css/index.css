@@ -210,7 +210,6 @@ button {
   height: 26px;
   padding: 0 13px;
   background: none;
-  border: 1px solid var(--theme-color);
   border-radius: 40px;
   color: var(--theme-color);
   cursor: pointer;
@@ -243,9 +242,13 @@ button {
 .btn.primary:hover,
 .btn.follow-btn.following:hover,
 .btn.new-reply:hover,
-.btn.unfollow:hover,
 .btn.new-post:hover {
   background: var(--primary-btn-hover);
+  color: #FFFFEE;
+}
+.btn.unfollow:hover {
+  background: var(--primary-btn-hover);
+  color: #221100;
 }
 .btn.primary:disabled,
 .btn.follow-btn.following:disabled,
@@ -253,15 +256,13 @@ button {
 .btn.unfollow:disabled,
 .btn.new-post:disabled {
   background: var(--theme-color-box-shadow) !important;
-  color: rgba(255, 255, 255, 0.9) !important;
   border: none !important;
 }
 .btn.follow-btn {
   width: 95px;
 }
 .btn.follow-btn.unfollow {
-  background: #c40e0e;
-  border-color: #c40e0e;
+  background: #F0F0E0;
 }
 .spinner {
   animation: rotate .75s infinite linear;

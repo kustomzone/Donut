@@ -27,10 +27,19 @@ module.exports = function renderFollowButton (profile) {
     cls = ''
   }
   return yo`
+    <button class="pmsg-btn btn ${cls}" onclick=${onTogglePM} onmouseover=${onMouseOver} onmouseout=${onMouseOut}>PM</button>
+	
     <button class="follow-btn btn ${cls}" onclick=${onToggleFollowing} onmouseover=${onMouseOver} onmouseout=${onMouseOut}>
       ${btnText}
     </button>`
 
+  // TODO (Private Messaging)
+  async function onTogglePM (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    // await app.togglePM(profile)
+  }
+  
   async function onToggleFollowing (e) {
     e.preventDefault()
     e.stopPropagation()

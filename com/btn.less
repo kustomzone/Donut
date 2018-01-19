@@ -10,7 +10,6 @@ button {
   height: 26px;
   padding: 0 13px;
   background: none;
-  border: 1px solid var(--theme-color);
   border-radius: 40px;
   color: var(--theme-color);
   cursor: pointer;
@@ -22,6 +21,7 @@ button {
   &:hover {
     background: var(--theme-color-faded);
     text-decoration: none;
+	color: #FFFFEE;
   }
 
   &:focus {
@@ -35,31 +35,34 @@ button {
 
   &.primary,
   &.follow-btn.following,
+  &.pmsg-btn,
   &.new-reply,
   &.unfollow,
   &.new-post {
-    background: var(--theme-color);
-    color: #fff;
+    background: var(--theme-color-faded);
+    color: #F0F0E0;
     -webkit-font-smoothing: antialiased;
     font-weight: 700;
 
     &:hover {
       background: var(--primary-btn-hover);
+	  color: #FFFFEE;
     }
 
     &:disabled {
       background: var(--theme-color-box-shadow) !important;
-      color: fadeout(#fff, 10%) !important;
+      color: #F0F0E0;
       border: none !important;
     }
   }
 
-  &.follow-btn {
-    width: 95px; // fix the width so on hover the text change doesn't change the width
+  &.follow-btn,
+  &.pmsg-btn  {
+    width: 95px; // so hover doesn't change the width
 
     &.unfollow {
-      background: #c40e0e;
-      border-color: #c40e0e;
+      background: #E4E0DA;
+	  color: #FFFFEE;
     }
   }
 }

@@ -272,7 +272,8 @@ function renderFeedItem (p) {
 },{"../lib/util":31,"./avatar":1,"./name":14,"./post-actions":17,"yo-yo":222}],4:[function(require,module,exports){
 /* globals app */
 
-const yo = require('yo-yo')
+const yo       = require('yo-yo')
+const appStart = require('../js/app')
 
 // globals
 let isHovering
@@ -299,10 +300,19 @@ module.exports = function renderFollowButton (profile) {
     cls = ''
   }
   return yo`
-    <button class="follow-btn btn ${cls}" onclick=${onToggleFollowing} onmouseover=${onMouseOver} onmouseout=${onMouseOut}>
-      ${btnText}
-    </button>`
+    <div style="width: 250px; flex-wrap: nowrap;">
+      <button class="pmsg-btn btn" onclick=${onPrivateMessage}>Private Msg</button>
+	  <button class="follow-btn btn ${cls}" onclick=${onToggleFollowing} onmouseover=${onMouseOver} onmouseout=${onMouseOut}>${btnText}</button>
+    </div>`
 
+  // TODO (Private Messaging)
+  async function onPrivateMessage (e) {
+    e.preventDefault()
+    e.stopPropagation()
+	// Connect as "friend"...
+    await app.appStartup(profile)
+  }
+  
   async function onToggleFollowing (e) {
     e.preventDefault()
     e.stopPropagation()
@@ -324,7 +334,7 @@ module.exports = function renderFollowButton (profile) {
   }
 }
 
-},{"yo-yo":222}],5:[function(require,module,exports){
+},{"yo-yo":222,"../js/app":236}],5:[function(require,module,exports){
 
 const yo = require('yo-yo')
 
@@ -386,10 +396,6 @@ module.exports = function renderHeader () {
         <span class="nav-item profile" onclick=${e => app.gotoProfile(app.currentUserProfile, e)}>
           <span class="label name">${app.currentUserProfile.name || 'Anonymous'}</span>
           ${renderAvatar(app.currentUserProfile, 'small')}
-        </span>
-
-        <span class="nav-item new-post">
-          <a href="/" onclick=${e => app.gotoFeed(e)} class="btn primary">New Post</a>
         </span>
 		
 		<span class="nav-item new-album">
@@ -1201,8 +1207,8 @@ function renderProfile (profile) {
 }
 
 },{"./avatar":1,"./follow-btn":4,"./name":14,"yo-yo":222}],28:[function(require,module,exports){
-const DonutApp = require('./lib/app')
 
+const DonutApp = require('./lib/app')
 window.app = new DonutApp()
 window.app.setup()
 
@@ -1390,9 +1396,7 @@ module.exports = class DonutApp {
           window.localStorage.notificationsLastReadTS = Date.now()
         }
       })
-    } catch (e) {
-      this.viewError = e.toString()
-    }
+    } catch (e) { this.viewError = e.toString() }
 
     this.render()
     window.scrollTo(0, 0)
@@ -1403,9 +1407,7 @@ module.exports = class DonutApp {
     this.render()
   }
 
-  render () {
-    views.render()
-  }
+  render () { views.render() }
 
   // loaders
   // =
@@ -1423,9 +1425,7 @@ module.exports = class DonutApp {
     var isAborted = false
     const apply = updates => {
       if (isAborted) return
-      for (var k in updates) {
-        this[k] = updates[k]
-      }
+      for (var k in updates) { this[k] = updates[k] }
     }
     this.currentLoaderPromise = fn(apply)
     this.currentLoaderPromise.abort = () => { isAborted = true }
@@ -1634,6 +1634,51 @@ module.exports = class DonutApp {
   removeFromWhoToFollow (userUrl) {
     this.whoToFollow = this.whoToFollow.filter(profile => profile.getRecordOrigin() !== userUrl)
   }
+
+  async appStartup (user) {
+    var userUrl = user.getRecordOrigin ? user.getRecordOrigin() : user.url // we may be given a profile record or a follows record
+	
+	yo.update( document.querySelector('#prompt'), yo`
+    <div id="crop-popup" class="popup-wrapper">
+      <div class="popup-inner">
+        <div class="head">
+          <div class="title">Private Messaging</div>
+        </div>
+        <div class="body">
+            <fieldset class="profile-fieldset"> <legend>Profile</legend>
+              <form class="profile-form">
+	            <div>Name: <input type="text" name="name" size="21" value="${user.name}"></div>
+                <div>ID:   <input type="text" name="id" size="60" value="${userUrl}" disabled></div>
+              </form>
+              <button type="button" class="profile-create-btn">Create</button>
+              <button type="button" class="profile-save-btn">Save</button>
+            </fieldset><br>
+            <fieldset class="friends-fieldset"> <legend>Friends</legend>
+              <ul class="friends-list"></ul>
+              <form class="friends-form">
+                <input type="text" name="friendid" pattern="[a-fA-F0-9]{64}" required />
+                <button type="button" class="friends-add-btn">Add friend</button>
+              </form>
+            </fieldset><br>
+            <fieldset class="chat-fieldset"> <legend class="chat-title">Chat</legend>
+              <ul class="chat-messages"></ul>
+              <ul style="max-height: 500px; overflow-y: auto;"></ul>
+              <form class="chat-form">
+                <input type="text" name="message" required minlength="1">
+                <button type="button" class="chat-send-btn">Send</button>
+                <button type="button" class="chat-disconnect-btn">Disconnect</button>
+              </form>
+            </fieldset>
+        </div>
+      </div>
+    </div>  `
+    )
+	
+  }
+  
+  // <div class="btns">
+  //   <button class="btn primary" onclick=${app.gotoProfile(userUrl)}>Back to Profile</button>
+  // </div>
 
   async toggleFollowing (user) {
     var userUrl = user.getRecordOrigin ? user.getRecordOrigin() : user.url // we may be given a profile record or a follows record
@@ -1891,11 +1936,12 @@ exports.linkifyText = function (input, opts) {
 }
 
 },{"yo-yo":222}],32:[function(require,module,exports){
-const WebDB = require('@beaker/webdb')
-const assert = require('assert')
-const LibFritterSocialAPI = require('./lib/social')
-const LibFritterFeedAPI = require('./lib/feed')
-const LibFritterNotificationsAPI = require('./lib/notifications')
+	
+const WebDB                           = require('@beaker/webdb')
+const assert                          = require('assert')
+const LibFritterSocialAPI             = require('./lib/social')
+const LibFritterFeedAPI               = require('./lib/feed')
+const LibFritterNotificationsAPI      = require('./lib/notifications')
 const {normalizeUrl, toArchiveOrigin} = require('./lib/util')
 
 // exported API
@@ -1909,8 +1955,8 @@ class LibFritter {
     defineTables(this.db)
     setHooks(this)
     this.userUrl = ''
-    this.social = new LibFritterSocialAPI(this)
-    this.feed = new LibFritterFeedAPI(this)
+    this.social        = new LibFritterSocialAPI(this)
+    this.feed          = new LibFritterFeedAPI(this)
     this.notifications = new LibFritterNotificationsAPI(this)
   }
 
@@ -2424,26 +2470,16 @@ exports.URL = URL
 
 exports.toUrl = function (v) {
   if (v) {
-    if (typeof v === 'string') {
-      return v
-    }
-    if (typeof v.getRecordURL === 'function') {
-      return v.getRecordURL()
-    }
-    if (typeof v.url === 'string') {
-      return v.url
-    }
+    if (typeof v === 'string') {                return v }
+    if (typeof v.getRecordURL === 'function') { return v.getRecordURL() }
+    if (typeof v.url === 'string') {            return v.url }
   }
 }
 
 exports.toArchiveOrigin = function (v) {
   if (v) {
-    if (typeof v.getRecordOrigin === 'function') {
-      return v.getRecordOrigin()
-    }
-    if (typeof v.url === 'string') {
-      v = v.url
-    }
+    if (typeof v.getRecordOrigin === 'function') { return v.getRecordOrigin() }
+    if (typeof v.url === 'string') { v = v.url }
     const urlp = new URL(v)
     return urlp.protocol + '//' + urlp.hostname
   }
@@ -2504,9 +2540,7 @@ class WebDB extends EventEmitter {
       veryDebug('duplicate open, returning ready promise')
       return this._dbReadyPromise
     }
-    if (this.isOpen) {
-      return
-    }
+    if (this.isOpen) { return }
     this.isBeingOpened = true // TODO needed?
     var neededRebuilds = []
 
@@ -2949,12 +2983,12 @@ class Index {
 }
 
 function arrayify (v) {
-  if (typeof v === 'undefined') return []
+  if (typeof v === 'undefined') { return [] }
   return Array.isArray(v) ? v : [v]
 }
 
 function toKey (key) {
-  if (typeof key === 'undefined') return undefined
+  if (typeof key === 'undefined') { return undefined }
   if (Array.isArray(key)) return key.join('!')
   return key
 }
@@ -2967,7 +3001,7 @@ function createKeysFromRecord (index, recordWrapper) {
     ? (keyPath) => {
       // multi-entry, look for value and then arrayify
       var values = lookupRecordValue(recordWrapper, keyPath[0])
-      if (typeof values === 'undefined') return false
+      if (typeof values === 'undefined') { return false }
       return arrayify(values)
     }
     : (keyPath) => {
@@ -2976,7 +3010,7 @@ function createKeysFromRecord (index, recordWrapper) {
       for (let i = 0; i < keyPath.length; i++) {
         let key = keyPath[i]
         let value = lookupRecordValue(recordWrapper, key)
-        if (typeof value === 'undefined' || typeof value === 'object') return false
+        if (typeof value === 'undefined' || typeof value === 'object') { return false }
         path.push(value)
       }
       return [path.join('!')]
@@ -2985,20 +3019,20 @@ function createKeysFromRecord (index, recordWrapper) {
   // try each possible keypath till a match is found
   for (let i = 0; i < index.keyPaths.length; i++) {
     let res = tryKeypath(index.keyPaths[i])
-    if (res) return res
+    if (res) { return res }
   }
   return []
 }
 
 function lookupRecordValue (recordWrapper, key) {
-  if (key === ':url') return recordWrapper.url
-  if (key === ':origin') return recordWrapper.origin
-  if (key === ':indexedAt') return recordWrapper.indexedAt
+  if (key === ':url')       { return recordWrapper.url }
+  if (key === ':origin')    { return recordWrapper.origin }
+  if (key === ':indexedAt') { return recordWrapper.indexedAt }
   return recordWrapper.record[key]
 }
 
 function normalizeIndexDef (index) {
-  if (index.startsWith('*')) return index.slice(1)
+  if (index.startsWith('*')) { return index.slice(1) }
   return index
 }
 
@@ -3067,9 +3101,7 @@ exports.unwatchArchive = function (db, archive) {
 }
 
 exports.resetOutdatedIndexes = async function (db, neededRebuilds) {
-  if (neededRebuilds.length === 0) {
-    return false
-  }
+  if (neededRebuilds.length === 0) { return false }
   debug(`Indexer.resetOutdatedIndexes need to rebuild ${neededRebuilds.length} tables`)
   veryDebug('Indexer.resetOutdatedIndexes tablesToRebuild', neededRebuilds)
 
@@ -3090,7 +3122,6 @@ exports.resetOutdatedIndexes = async function (db, neededRebuilds) {
     promises.push(db._indexMetaLevel.put(indexMeta.url, indexMeta))
   })
   await Promise.all(promises)
-
   return true
 }
 
@@ -3101,9 +3132,7 @@ async function indexArchive (db, archive) {
   var release = await lock(`index:${archive.url}`)
   try {
     // sanity check
-    if (!db.isOpen && !db.isBeingOpened) {
-      return
-    }
+    if (!db.isOpen && !db.isBeingOpened) { return }
     if (!db.level) {
       return console.log('indexArchive called on corrupted db')
     }
@@ -3119,7 +3148,7 @@ async function indexArchive (db, archive) {
     if (indexMeta && indexMeta.version >= archiveMeta.version) {
       debug('Indexer.indexArchive no index needed for', archive.url)
       db.emit('source-indexed', archive.url, archiveMeta.version)
-      return // yes, stop
+      return
     }
     debug('Indexer.indexArchive', archive.url, 'start', indexMeta.version, 'end', archiveMeta.version)
 
@@ -3137,12 +3166,9 @@ async function indexArchive (db, archive) {
       version: archiveMeta.version // record the version we've indexed
     })
 
-    // emit
     db.emit('source-indexed', archive.url, archiveMeta.version)
     db.emit('indexes-updated', archive.url, archiveMeta.version)
-  } finally {
-    release()
-  }
+  } finally { release() }
 }
 exports.indexArchive = indexArchive
 
@@ -3154,9 +3180,7 @@ async function unindexArchive (db, archive) {
     var recordMatches = await scanArchiveForRecords(db, archive)
     await Promise.all(recordMatches.map(match => match.table.level.del(match.recordUrl)))
     await db._indexMetaLevel.del(archive.url)
-  } finally {
-    release()
-  }
+  } finally { release() }
 }
 exports.unindexArchive = unindexArchive
 
@@ -3165,7 +3189,6 @@ async function readAndIndexFile (db, archive, filepath) {
   const tables = db.tables
   const fileUrl = archive.url + filepath
   try {
-    // read file
     var record = JSON.parse(await archive.readFile(filepath))
 
     // index on the first matching table
@@ -3207,9 +3230,7 @@ async function readAndIndexFile (db, archive, filepath) {
         }
       }
     }
-  } catch (e) {
-    console.log('Failed to index', fileUrl, e)
-  }
+  } catch (e) { console.log('Failed to index', fileUrl, e) }
 }
 exports.readAndIndexFile = readAndIndexFile
 
@@ -3231,9 +3252,7 @@ async function unindexFile (db, archive, filepath) {
         } catch (e) { console.error(e) }
       }
     }
-  } catch (e) {
-    console.log('Failed to unindex', fileUrl, e)
-  }
+  } catch (e) { console.log('Failed to unindex', fileUrl, e) }
 }
 exports.unindexFile = unindexFile
 
@@ -3311,21 +3330,22 @@ async function applyUpdates (db, archive, updates) {
 }
 
 },{"./util":45,"./util-level":44,"anymatch":51,"lodash.flatten":125}],41:[function(require,module,exports){
-const LevelUtil = require('./util-level')
-const WebDBWhereClause = require('./where-clause')
-const Indexer = require('./indexer')
-const {assert, debug} = require('./util')
+
+const LevelUtil                    = require('./util-level')
+const WebDBWhereClause             = require('./where-clause')
+const Indexer                      = require('./indexer')
+const {assert, debug}              = require('./util')
 const {QueryError, ParameterError} = require('./errors')
 
 class WebDBQuery {
   constructor (table) {
-    this._table = table
+    this._table   = table
     this._filters = []
     this._reverse = false
-    this._offset = 0
-    this._limit = false
-    this._until = null
-    this._where = null
+    this._offset  = 0
+    this._limit   = false
+    this._until   = null
+    this._where   = null
   }
 
   // () => WebDBQuery
@@ -3657,8 +3677,8 @@ const {ParameterError, QueryError} = require('./errors')
 class WebDBTable extends EventEmitter {
   constructor (db, name, schema) {
     super()
-    this.db = db
-    this.name = name
+    this.db     = db
+    this.name   = name
     this.schema = schema
     this.isHelperTable = !!schema.helperTable
     veryDebug('WebDBTable', this.name, this.schema)
@@ -3672,29 +3692,19 @@ class WebDBTable extends EventEmitter {
   // =
 
   // () => WebDBQuery
-  query () {
-    return new WebDBQuery(this)
-  }
+  query () { return new WebDBQuery(this) }
 
   // () => Promise<Number>
-  async count () {
-    return this.query().count()
-  }
+  async count () { return this.query().count() }
 
   // (url) => Promise<url>
-  async delete (url) {
-    return this.where(':url').equals(url).delete()
-  }
+  async delete (url) { return this.where(':url').equals(url).delete() }
 
   // (Function) => Promise<Void>
-  async each (fn) {
-    return this.query().each(fn)
-  }
+  async each (fn) { return this.query().each(fn) }
 
   // (Function) => WebDBQuery
-  filter (fn) {
-    return this.query().filter(fn)
-  }
+  filter (fn) { return this.query().filter(fn) }
 
   // (url) => Promise<Object>
   // (key, value) => Promise<Object>
@@ -3706,19 +3716,13 @@ class WebDBTable extends EventEmitter {
   }
 
   // (Number) => WebDBQuery
-  limit (n) {
-    return this.query().limit(n)
-  }
+  limit (n) { return this.query().limit(n) }
 
   // (Number) => WebDBQuery
-  offset (n) {
-    return this.query().offset(n)
-  }
+  offset (n) { return this.query().offset(n) }
 
   // (index) => WebDBQuery
-  orderBy (index) {
-    return this.query().orderBy(index)
-  }
+  orderBy (index) { return this.query().orderBy(index) }
 
   // (url, record) => Promise<url>
   async put (url, record, noLockNeeded = false) {
@@ -3776,26 +3780,18 @@ class WebDBTable extends EventEmitter {
         }
         await Indexer.indexArchive(this.db, archive)
         return url
-      } finally {
-        release()
-      }
+      } finally { release() }
     }
   }
 
   // () => WebDBQuery
-  reverse () {
-    return this.query().reverse()
-  }
+  reverse () { return this.query().reverse() }
 
   // () => Promise<Array>
-  async toArray () {
-    return this.query().toArray()
-  }
+  async toArray () { return this.query().toArray() }
 
   // (url, Object|Function) => Promise<Number>
-  async update (url, objOrFn) {
-    return updateByUrl(this, url, objOrFn)
-  }
+  async update (url, objOrFn) { return updateByUrl(this, url, objOrFn) }
 
   // (url, Object|Function) => Promise<url>
   async upsert (url, objOrFn) {
@@ -3810,9 +3806,7 @@ class WebDBTable extends EventEmitter {
         return this.put(url, typeof objOrFn === 'function' ? objOrFn() : objOrFn, true)
       }
       return changes
-    } finally {
-      release()
-    }
+    } finally { release() }
   }
 
   // (index|query) => WebDBWhereClause|WebDBQuery
@@ -3825,17 +3819,13 @@ class WebDBTable extends EventEmitter {
 
   // (String) => Boolean
   isRecordFile (filepath) {
-    if (this.isHelperTable) {
-      return false
-    }
+    if (this.isHelperTable) { return false }
     return anymatch(this._filePattern, filepath)
   }
 
   // (DatArchive) => Array<Object>
   async listRecordFiles (archive) {
-    if (this.isHelperTable) {
-      return []
-    }
+    if (this.isHelperTable) { return [] }
     try {
       // scan for matching records
       let records = await archive.readdir('/', {recursive: true})
@@ -3845,9 +3835,7 @@ class WebDBTable extends EventEmitter {
           table: this
         }
       })
-    } catch (e) {
-      return []
-    }
+    } catch (e) { return [] }
   }
 }
 
@@ -4057,9 +4045,7 @@ exports.veryDebug = (LOG_LEVEL >= LOG_LEVEL_VERYDEBUG) ? console.log : noop
 
 // assert helper
 exports.assert = function (cond, ErrorConstructor = Error, msg) {
-  if (!cond) {
-    throw new ErrorConstructor(msg)
-  }
+  if (!cond) { throw new ErrorConstructor(msg) }
 }
 
 // provide a diff of 2 arrays
@@ -4081,9 +4067,7 @@ exports.diffArrays = function (left, right) {
     }
   }
 
-  if (diff.add.length === 0 && diff.remove.add === 0) {
-    return false
-  }
+  if (diff.add.length === 0 && diff.remove.add === 0) { return false }
   return diff
 }
 
@@ -4094,7 +4078,7 @@ exports.getObjectChecksum = function (object) {
 // this helper includes functions in the JSON output used in getObjectChecksum
 // that way the checksum changes if any function definitions change
 function checksumStringify (k, v) {
-  if (typeof v === 'function') return v.toString()
+  if (typeof v === 'function') { return v.toString() }
   return v
 }
 
@@ -4104,9 +4088,7 @@ exports.deepClone = function (v) {
 
 exports.toArchiveUrl = function (v) {
   if (v) {
-    if (typeof v.url === 'string') {
-      v = v.url
-    }
+    if (typeof v.url === 'string') { v = v.url }
     const urlp = new URL(v)
     return urlp.protocol + '//' + urlp.hostname
   }
@@ -4124,8 +4106,7 @@ async function foo () {
 */
 var locks = {}
 exports.lock = async function (key) {
-  if (!(key in locks)) locks[key] = new AwaitLock()
-
+  if (!(key in locks)) { locks[key] = new AwaitLock() }
   var lock = locks[key]
   await lock.acquireAsync()
   return lock.release.bind(lock)
@@ -4143,12 +4124,12 @@ const MAX_STRING = String.fromCharCode(65535)
 
 class WebDBWhereClause {
   constructor (query, index) {
-    this.query = query
-    this._index = index
-    this._only = undefined
-    this._lowerBound = undefined
+    this.query                = query
+    this._index               = index
+    this._only                = undefined
+    this._lowerBound          = undefined
     this._lowerBoundInclusive = false
-    this._upperBound = undefined
+    this._upperBound          = undefined
     this._upperBoundInclusive = false
   }
 
@@ -4288,9 +4269,7 @@ class WebDBWhereClause {
       return testValues(this, record, v => {
         v = (v || '').toString()
         for (let i = 0; i < args.length; i++) {
-          if (v.startsWith(args[i])) {
-            return true
-          }
+          if (v.startsWith(args[i])) { return true }
         }
         return false
       })
@@ -4309,9 +4288,7 @@ class WebDBWhereClause {
       return testValues(this, record, v => {
         v = (v || '').toString().toLowerCase()
         for (let i = 0; i < args.length; i++) {
-          if (v.startsWith(args[i])) {
-            return true
-          }
+          if (v.startsWith(args[i])) { return true }
         }
         return false
       })
@@ -4341,22 +4318,20 @@ function testValues (where, record, fn) {
   var v
   var keyPaths = where.query._table.level.indexes[where._index].keyPaths
   for (let i = 0; i < keyPaths.length; i++) {
-    if (typeof v !== 'undefined') break
+    if (typeof v !== 'undefined') { break }
     v = lookupRecordValue(record, keyPaths[i][0])
   }
-  if (typeof v === 'undefined') return false
+  if (typeof v === 'undefined') { return false }
 
   // run the test
-  if (Array.isArray(v)) {
-    return v.reduce((agg, v) => agg || fn(v), false)
-  }
+  if (Array.isArray(v)) { return v.reduce((agg, v) => agg || fn(v), false) }
   return fn(v)
 }
 
 function lookupRecordValue (record, key) {
-  if (key === ':url') return record.getRecordURL()
-  if (key === ':origin') return record.getRecordOrigin()
-  if (key === ':indexedAt') return record.getIndexedAt()
+  if (key === ':url')       { return record.getRecordURL() }
+  if (key === ':origin')    { return record.getRecordOrigin() }
+  if (key === ':indexedAt') { return record.getIndexedAt() }
   return record[key]
 }
 
@@ -4366,7 +4341,7 @@ function toArrayOfStrings (arr, {toLowerCase} = {}) {
       throw new ParameterError()
     }
     v = v ? v.toString() : ''
-    if (toLowerCase) v = v.toLowerCase()
+    if (toLowerCase) { v = v.toLowerCase() }
     return v
   })
 }
@@ -25486,8 +25461,41 @@ function renderImageSettingz () {
 }
 
 
-},{"yo-yo":222,"../com/image-settings":235}]},{},[28]);
+},{"yo-yo":222,"../com/image-settings":235}],236:[function(require,module,exports){
+/* globals app */
 
-}, 5000)
+const yo = require('yo-yo')
+const appStart = require('../js/app')
+
+// exported api
+// =
+
+module.exports = function () {
+  return yo`
+      <div class="sidebar-col">
+		${appStartup()}
+      </div>
+
+  `
+}
+
+// internal methods
+// =
+
+function appStartup (profile) {
+  alert("Connecting to " + profile)
+  
+  return yo`
+    <div id="image-settings" class="settings-view image-settings-wrap">
+      <h2>Private Message</h2>
+
+    </div>
+  `
+  
+}
+  
+},{"yo-yo":222,"../js/app":236}]},{},[28]);
+
+}, 5000);
 
 ///// eof /////
